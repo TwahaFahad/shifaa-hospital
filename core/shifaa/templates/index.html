@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Patients</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Patient Management</h1>
+
+    <!-- Section to display all patients -->
+    <div id="patients-section">
+        <h2>All Patients</h2>
+        <button onclick="loadPatients()">View All Patients</button>
+        <div id="patients-list"></div>
+    </div>
+
+    <!-- Section to add a new patient -->
+    <div id="add-patient-section">
+        <h2>Add New Patient</h2>
+        <form id="add-patient-form">
+            <input type="text" id="first_name" placeholder="First Name" required><br>
+            <input type="text" id="last_name" placeholder="Last Name" required><br>
+            <input type="date" id="dob" required><br>
+            <select id="gender" required>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select><br>
+            <input type="text" id="contact_info" placeholder="Contact Info" required><br>
+            <button type="submit">Add Patient</button>
+        </form>
+    </div>
+
+    <!-- Section to update patient -->
+    <div id="update-patient-section">
+        <h2>Update Patient</h2>
+        <form id="update-patient-form">
+            <input type="hidden" id="update_patient_id">
+            <input type="text" id="update_first_name" placeholder="First Name" required><br>
+            <input type="text" id="update_last_name" placeholder="Last Name" required><br>
+            <input type="date" id="update_dob" required><br>
+            <select id="update_gender" required>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select><br>
+            <input type="text" id="update_contact_info" placeholder="Contact Info" required><br>
+            <button type="submit">Update Patient</button>
+        </form>
+    </div>
+
+    <!-- Section to search a patient by ID -->
+    <div id="search-patient-section">
+        <h2>Search Patient by ID</h2>
+        <input type="number" id="search_patient_id" placeholder="Patient ID" required><br>
+        <button onclick="searchPatient()">Search Patient</button>
+        <div id="search-patient-result"></div>
+    </div>
+
+
+    <!-- Section to delete a patient -->
+    <div id="delete-patient-section">
+        <h2>Delete Patient</h2>
+        <input type="number" id="delete_patient_id" placeholder="Patient ID" required><br>
+        <button onclick="deletePatient()">Delete Patient</button>
+    </div>
+
+    <!-- JavaScript for AJAX requests -->
+    <script>
+        // Load all patients
+        function loadPatients() {
+            $.ajax({
+                url: '/shifaa/patients/',
+                type: 'GET',
+                success: function(response) {
+                    let patientsHtml = '';
+                    response.patients.forEach(function(patient) {
+                        patientsHtml += `<p>${patient.first_name} ${patient.last_name} - ${patient.dob} - ${patient.gender} - ${patient.contact_info}</p>`;
+                    });
+                    $('#patients-list').html(patientsHtml);
+                },
+                error: function(error) {
+                    alert('Error loading patients');
+                }
+            });
+        }
+
+        // Add new patient
+        $('#add-patient-form').submit(function(event) {
+            event.preventDefault();
+            const patientData = {
+                first_name: $('#first_name').val(),
+                last_name: $('#last_name').val(),
+                dob: $('#dob').val(),
+                gender: $('#gender').val(),
+                contact_info: $('#contact_info').val(),
+            };
+
+            $.ajax({
+                url: '/shifaa/patients/add/',
+                type: 'POST',
+                data: patientData,
+                success: function(response) {
+                    alert('Patient added successfully');
+                    loadPatients();
+                },
+                error: function(error) {
+                    alert('Error adding patient');
+                }
+            });
+        });
+
+        // Update patient
+        $('#update-patient-form').submit(function(event) {
+            event.preventDefault();
+            const patientId = $('#update_patient_id').val();
+            const patientData = {
+                first_name: $('#update_first_name').val(),
+                last_name: $('#update_last_name').val(),
+                dob: $('#update_dob').val(),
+                gender: $('#update_gender').val(),
+                contact_info: $('#update_contact_info').val(),
+            };
+
+            $.ajax({
+                url: `/shifaa/patients/update/${patientId}/`,
+                type: 'POST',
+                data: patientData,
+                success: function(response) {
+                    alert('Patient updated successfully');
+                    loadPatients();
+                },
+                error: function(error) {
+                    alert('Error updating patient');
+                }
+            });
+        });
+
+        // Search patient by ID
+        function searchPatient() {
+            const patientId = $('#search_patient_id').val();
+    
+            $.ajax({
+                url: `/shifaa/patients/${patientId}/`,
+                type: 'GET',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        const patient = response.patient;
+                        const resultHtml = `<p>${patient.first_name} ${patient.last_name} - ${patient.dob} - ${patient.gender} - ${patient.contact_info}</p>`;
+                        $('#search-patient-result').html(resultHtml);
+                    } else {
+                        $('#search-patient-result').html(`<p>${response.message}</p>`);
+                    }
+                },
+                error: function(error) {
+                    $('#search-patient-result').html('<p>Error fetching patient. Please try again.</p>');
+                }
+            });
+        }
+
+        // Delete patient
+        function deletePatient() {
+            const patientId = $('#delete_patient_id').val();
+
+            $.ajax({
+                url: `/shifaa/patients/delete/${patientId}/`,
+                type: 'POST',
+                success: function(response) {
+                    alert('Patient deleted successfully');
+                    loadPatients();
+                },
+                error: function(error) {
+                    alert('Error deleting patient');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
