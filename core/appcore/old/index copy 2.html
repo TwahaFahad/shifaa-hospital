@@ -8,7 +8,7 @@
 <div class="grid grid-cols-1 gap-4 sm:gap-5 lg:gap-6 mt-5">
 
     
-    <section id="section1">
+    
     <div>
 
       <div class="flex items-center justify-between">
@@ -33,13 +33,12 @@
         <div class="flex">
           <div class="flex items-center" x-data="{isInputActive:false}">
             <label class="block">
-              <input id="search-input" 
+              <input
                 x-effect="isInputActive === true && $nextTick(() => { $el.focus()});"
                 :class="isInputActive ? 'w-32 lg:w-48' : 'w-0'"
                 class="form-input bg-transparent px-1 text-right transition-all duration-100 placeholder:text-slate-500 dark:placeholder:text-navy-200"
-                placeholder="Search by first name"
+                placeholder="Search here..."
                 type="text"
-                onkeyup="searchPatients()"
               />
             </label>
             <button
@@ -223,12 +222,11 @@
 
 
     </div>
-    <section>
 
-<section id="section2"> 
+        
     <div>
 
-            <div class="flex items-center justify-between mt-3">
+            <div class="flex items-center justify-between">
     
                 <button id="view-referrals-btn"
                 class="btn min-w-[7rem] rounded-full bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
@@ -427,12 +425,11 @@
       
       
     </div>
-<section>
 
-<section id="section3">
+
     <div>
 
-        <div class="flex items-center justify-between mt-3">
+        <div class="flex items-center justify-between">
 
   
   
@@ -610,8 +607,7 @@
         </div>
   
   
- </div>
-<section>
+</div>
 
 
 
@@ -696,8 +692,8 @@
                         class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                     >
                         <option value="">Select Gender</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
                     </select>
                 </label>
                 <label class="block">
@@ -712,7 +708,7 @@
                 </label>
 
 
-                <div class="space-x-2 text-right mt-3">
+                <div class="space-x-2 text-right">
                     <button onclick="toggleModal('modal-background')" 
                     class="btn min-w-[7rem] rounded-full border border-slate-300 font-medium text-slate-800 hover:bg-slate-150 focus:bg-slate-150 active:bg-slate-150/80 dark:border-navy-450 dark:text-navy-50 dark:hover:bg-navy-500 dark:focus:bg-navy-500 dark:active:bg-navy-500/90"
                     >
@@ -802,7 +798,7 @@
                 </label>
 
 
-                <div class="space-x-2 text-right mt-3">
+                <div class="space-x-2 text-right">
                     <button onclick="toggleModal('modal-background2')" 
                     class="btn min-w-[7rem] rounded-full border border-slate-300 font-medium text-slate-800 hover:bg-slate-150 focus:bg-slate-150 active:bg-slate-150/80 dark:border-navy-450 dark:text-navy-50 dark:hover:bg-navy-500 dark:focus:bg-navy-500 dark:active:bg-navy-500/90"
                     >
@@ -874,7 +870,7 @@
                 </label>
 
 
-                <div class="space-x-2 text-right mt-3">
+                <div class="space-x-2 text-right">
                     <button type="submit" 
                     class="btn min-w-[7rem] rounded-full bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
                     >
@@ -939,7 +935,7 @@
                 </label>
 
 
-                <div class="space-x-2 text-right mt-3">
+                <div class="space-x-2 text-right">
                     <button onclick="toggleModal('modal-background4')" 
                     class="btn min-w-[7rem] rounded-full border border-slate-300 font-medium text-slate-800 hover:bg-slate-150 focus:bg-slate-150 active:bg-slate-150/80 dark:border-navy-450 dark:text-navy-50 dark:hover:bg-navy-500 dark:focus:bg-navy-500 dark:active:bg-navy-500/90"
                     >
@@ -1017,7 +1013,7 @@
                     />
                 </label>
 
-                <div class="space-x-2 text-right mt-3">
+                <div class="space-x-2 text-right">
                     <button onclick="toggleModal('modal-background5')" 
                     class="btn min-w-[7rem] rounded-full border border-slate-300 font-medium text-slate-800 hover:bg-slate-150 focus:bg-slate-150 active:bg-slate-150/80 dark:border-navy-450 dark:text-navy-50 dark:hover:bg-navy-500 dark:focus:bg-navy-500 dark:active:bg-navy-500/90"
                     >
@@ -1258,7 +1254,6 @@
 
     
     <script>
-        let patientsData = [];
 
         function toggleModal(modalId) {
             const modal = document.getElementById(modalId);
@@ -1312,20 +1307,9 @@
                 url: '/shifaa/patients/',
                 type: 'GET',
                 success: function(response) {
-                    patientsData = response.patients;
-                    displayPatients(patientsData);
-                },
-                error: function(error) {
-                    alert('Error loading patients');
-                }
-            });
-        }
-
-
-        function displayPatients(patients) {
-            let patientHtml = '';
-            patients.forEach(function(patient) {
-                patientHtml += `
+                    let patientHtml = '';
+                    response.patients.forEach(function(patient) {
+                        patientHtml += `
                             <tr class="border-y border-transparent border-b-slate-200 dark:border-b-navy-500">
                                 <td class="whitespace-nowrap px-3 py-3 font-medium text-slate-700 dark:text-navy-100 lg:px-5">${patient.first_name} ${patient.last_name}</td>
                                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">${patient.dob}</td>
@@ -1393,25 +1377,15 @@
                                     </div>
                                 </td>
                                 </tr>
-                            
-                `;
+                            `;
+                    });
+                    $('#patient-list').html(patientHtml);
+                },
+                error: function(error) {
+                    alert('Error loading patients');
+                }
             });
-            $('#patient-list').html(patientHtml);
         }
-
-
-        function searchPatients() {
-            const searchValue = $('#search-input').val().toLowerCase();
-            const filteredPatients = patientsData.filter(patient => 
-                patient.first_name.toLowerCase().includes(searchValue)
-            );
-            displayPatients(filteredPatients);
-        }
-    
-        $(document).ready(function() {
-            loadPatients();
-        });
-
 
         {% comment %} function loadReferrals() {
             $.ajax({

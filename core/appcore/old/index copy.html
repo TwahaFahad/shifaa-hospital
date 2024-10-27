@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Patients</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Patient Management</h1>
+
+    <!-- Section to display all patients -->
+    <h2>All Patients</h2>
+    <button onclick="loadPatients()">View All Patients</button>
+    <div id="patient-list"></div>
+
+    <!-- Section to add a new patient -->
+    <div id="add-patient-section">
+        <h2>Add New Patient</h2>
+        <form id="add-patient-form">
+            <input type="text" id="first_name" placeholder="First Name" required><br>
+            <input type="text" id="last_name" placeholder="Last Name" required><br>
+            <input type="date" id="dob" required><br>
+            <select id="gender" required>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select><br>
+            <input type="text" id="contact_info" placeholder="Contact Info" required><br>
+            <button type="submit">Add Patient</button>
+        </form>
+    </div>
+
+    <!-- Hidden form for updating patients -->
+    <div id="update-patient-section" style="display:none;">
+        <h2>Update Patient</h2>
+        <form id="update-patient-form">
+            <input type="hidden" id="update_patient_id">
+            <input type="text" id="update_first_name" placeholder="First Name" required><br>
+            <input type="text" id="update_last_name" placeholder="Last Name" required><br>
+            <input type="date" id="update_dob" placeholder="Date of Birth" required><br>
+            <label>
+                Gender:
+                <select id="update_gender" required>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </label><br>
+            <input type="text" id="update_contact_info" placeholder="Contact Info" required><br>
+            <button type="submit">Update Patient</button>
+        </form>
+    </div>
+
+    <!-- Section to search a patient by ID -->
+    <div id="search-patient-section">
+        <h2>Search Patient by ID</h2>
+        <input type="number" id="search_patient_id" placeholder="Patient ID" required><br>
+        <button onclick="searchPatient()">Search Patient</button>
+        <div id="search-patient-result"></div>
+    </div>
+
+
+    <!-- Section to delete a patient -->
+    <div id="delete-patient-section"></div>
+
+
+    <h2>All Equipment</h2>
+    <button onclick="loadEquipment()">View All Equipment</button>
+    <div id="equipment-list"></div>
+
+    <h2>Add New Equipment</h2>
+    <form id="add-equipment-form">
+        <input type="text" id="equipment_name" placeholder="Equipment Name" required><br>
+        <input type="text" id="description" placeholder="Description" required><br>
+        <label>
+            Available:
+            <select id="available" required>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+        </label><br>
+        <button type="submit">Add Equipment</button>
+    </form>
+
+    <!-- Hidden form for updating equipment -->
+    <div id="update-equipment-section" style="display:none;">
+        <h2>Update Equipment</h2>
+        <form id="update-equipment-form">
+            <input type="hidden" id="update_equipment_id">
+            <input type="text" id="update_equipment_name" placeholder="Equipment Name" required><br>
+            <input type="text" id="update_description" placeholder="Description" required><br>
+            <label>
+                Available:
+                <select id="update_available" required>
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>
+            </label><br>
+            <button type="submit">Update Equipment</button>
+        </form>
+    </div>
+
+    <!-- Section to delete equipment -->
+    <div id="delete-equipment-section"></div>
+
+    <!-- Hidden form for diagnosing a patient -->
+    <div id="diagnose-form-section" style="display:none;">
+        <h2>Diagnose Patient</h2>
+        <form id="diagnose-form">
+            <input type="hidden" id="diagnose_patient_id">
+            <input type="text" id="diagnostic_type" placeholder="Diagnostic Type" required><br>
+            <input type="text" id="diagnostic_result" placeholder="Result" required><br>
+            <input type="date" id="diagnostic_date_taken" placeholder="Date Taken" required><br>
+            <textarea id="diagnostic_notes" placeholder="Notes"></textarea><br>
+            <button type="submit">Add Diagnostic</button>
+        </form>
+    </div>
+
+    <!-- Hidden form for referring a patient -->
+    <div id="referral-form-section" style="display:none;">
+        <h2>Refer Patient</h2>
+        <form id="referral-form">
+            <input type="hidden" id="referral_patient_id">
+            <input type="text" id="referred_to" placeholder="Referred To (Hospital ID)" required><br>
+            <input type="text" id="referral_reason" placeholder="Referral Reason" required><br>
+            <input type="date" id="referral_date" placeholder="Referral Date" required><br>
+            <button type="submit">Add Referral</button>
+        </form>
+    </div>
+
+    <!-- Hidden form for adding medical history -->
+    <div id="medical-history-form-section" style="display:none;">
+        <h2>Add Medical History</h2>
+        <form id="medical-history-form">
+            <input type="hidden" id="medical_history_patient_id">
+            <input type="text" id="condition" placeholder="Condition" required><br>
+            <input type="text" id="treatment" placeholder="Treatment" required><br>
+            <input type="date" id="start_date" placeholder="Start Date" required><br>
+            <input type="date" id="end_date" placeholder="End Date"><br>
+            <textarea id="medical_history_notes" placeholder="Notes"></textarea><br>
+            <button type="submit">Add Medical History</button>
+        </form>
+    </div>
+
+  
+    <!-- Button to trigger fetching referrals -->
+    <button id="view-referrals-btn">View All Referrals</button>
+
+    <!-- Table to display referrals -->
+    <table id="referrals-table" style="display: none;">
+        <thead>
+            <tr>
+                <th>Patient Name</th>
+                <th>Referred From</th>
+                <th>Referred To</th>
+                <th>Referral Reason</th>
+                <th>Referral Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Rows will be dynamically added here -->
+        </tbody>
+    </table>
+
+
+
+    <!-- JavaScript for AJAX requests -->
+    <script>
+
+        $(document).ready(function() {
+            loadPatients();
+        });
+
+        // Load all patients
+        function loadPatients() {
+            $.ajax({
+                url: '/shifaa/patients/',
+                type: 'GET',
+                success: function(response) {
+                    let patientHtml = '';
+                    response.patients.forEach(function(patient) {
+                        patientHtml += `
+                            <p>
+                                ${patient.first_name} ${patient.last_name} - DOB: ${patient.dob} - Gender: ${patient.gender} - Contact: ${patient.contact_info}
+                                <button onclick="openDiagnoseForm(${patient.id})">Diagnose</button>
+                                <button onclick="openReferralForm(${patient.id})">Refer</button>
+                                <button onclick="openMedicalHistoryForm(${patient.id})">Add Medical History</button>
+                                <button onclick="editPatient(${patient.id}, '${patient.first_name}', '${patient.last_name}', '${patient.dob}', '${patient.gender}', '${patient.contact_info}')">Update</button>
+                                <button onclick="deletePatient(${patient.id})">Delete</button>
+                            </p>`;
+                    });
+                    $('#patient-list').html(patientHtml);
+                },
+                error: function(error) {
+                    alert('Error loading patients');
+                }
+            });
+        }
+
+        {% comment %} function loadReferrals() {
+            $.ajax({
+                url: '/shifaa/referrals/',
+                type: 'GET',
+                success: function(response) {
+                    let referralsHtml = '';
+                    response.referrals.forEach(function(referrals) {
+                        patientHtml += `
+                            <p>
+                                ${referrals.patient} - FROM: ${referrals.referred_from} - To: ${referrals.referred_to} - Status: ${referrals.status}
+                                <button onclick="deletePatient(${referral.id})">Delete</button>
+                            </p>`;
+                    });
+                    $('#referrals-list').html(referralsHtml);
+                },
+                error: function(error) {
+                    alert('Error loading referrals');
+                }
+            });
+
+        } {% endcomment %}
+
+
+        // Add new patient
+        $('#add-patient-form').submit(function(event) {
+            event.preventDefault(); // Prevent the form from submitting normally
+
+            // Collect patient data
+            const patientData = {
+                first_name: $('#first_name').val(),
+                last_name: $('#last_name').val(),
+                dob: $('#dob').val(),
+                gender: $('#gender').val(),
+                contact_info: $('#contact_info').val()
+            };
+
+            // AJAX request to add a new patient
+            $.ajax({
+                url: '/shifaa/patients/add/',  // Adjust this URL if needed based on your API endpoint
+                type: 'POST',
+                data: patientData,
+                success: function(response) {
+                    alert('Patient added successfully');
+                    loadPatients(); // Reload the patient list
+                },
+                error: function(error) {
+                    alert('Error adding patient');
+                }
+            });
+        });
+
+
+
+        // Fetch referrals when the button is clicked
+        $('#view-referrals-btn').click(function() {
+            fetchReferrals();
+        });
+
+        // Function to fetch all referrals
+        function fetchReferrals() {
+            $.ajax({
+                url: '/shifaa/referrals/',
+                type: 'GET',
+                success: function(response) {
+                    const referrals = response.referrals;
+                    const referralsTable = $('#referrals-table tbody');
+                    referralsTable.empty();  // Clear the table before adding new rows
+                    
+                    // Show the table after data is fetched
+                    $('#referrals-table').show();
+
+                    referrals.forEach(referral => {
+                        let row = `
+                            <tr>
+                                <td>${referral.patient_name}</td>
+                                <td>${referral.referred_from_name}</td>
+                                <td>${referral.referred_to_name}</td>
+                                <td>${referral.referral_reason}</td>
+                                <td>${referral.referral_date}</td>
+                        `;
+
+                        // Check if the referral is to hospital ID 2 and status is "Pending"
+                        if (referral.referred_to === 2 && referral.status === "Pending") {
+                            row += `<td><button class="accept-btn" data-id="${referral.id}">Accept</button></td>`;
+                        } else {
+                            row += `<td>${referral.status}</td>`;
+                        }
+
+                        row += '</tr>';
+                        referralsTable.append(row);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching referrals:", error);
+                }
+            });
+        }
+
+        // Accept referral when the Accept button is clicked
+        $('#referrals-table').on('click', '.accept-btn', function() {
+            const referralId = $(this).data('id');
+
+            $.ajax({
+                url: `/shifaa/referrals/update/${referralId}/`,
+                type: 'POST',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        alert(response.message);
+                        fetchReferrals();  // Refresh the table after updating
+                    } else {
+                        alert("Error: " + response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error updating referral:", error);
+                }
+            });
+        });
+
+
+        // Edit patient
+        function editPatient(id, firstName, lastName, dob, gender, contactInfo) {
+            $('#update_patient_id').val(id);
+            $('#update_first_name').val(firstName);
+            $('#update_last_name').val(lastName);
+            $('#update_dob').val(dob);
+            $('#update_gender').val(gender);
+            $('#update_contact_info').val(contactInfo);
+            $('#update-patient-section').show();
+        }
+
+        // Update patient
+        $('#update-patient-form').submit(function(event) {
+            event.preventDefault();
+            const patientId = $('#update_patient_id').val();
+            const patientData = {
+                first_name: $('#update_first_name').val(),
+                last_name: $('#update_last_name').val(),
+                dob: $('#update_dob').val(),
+                gender: $('#update_gender').val(),
+                contact_info: $('#update_contact_info').val(),
+            };
+
+            $.ajax({
+                url: `/shifaa/patients/update/${patientId}/`,
+                type: 'POST',
+                data: patientData,
+                success: function(response) {
+                    alert('Patient updated successfully');
+                    loadPatients();
+                    $('#update-patient-section').hide();
+                },
+                error: function(error) {
+                    alert('Error updating patient');
+                }
+            });
+        });
+
+        // Delete patient
+        function deletePatient(id) {
+            if (confirm('Are you sure you want to delete this patient?')) {
+                $.ajax({
+                    url: `/shifaa/patients/delete/${id}/`,
+                    type: 'POST',
+                    success: function(response) {
+                        alert('Patient deleted successfully');
+                        loadPatients();
+                    },
+                    error: function(error) {
+                        alert('Error deleting patient');
+                    }
+                });
+            }
+        }
+
+
+        // Search patient by ID
+        function searchPatient() {
+            const patientId = $('#search_patient_id').val();
+    
+            $.ajax({
+                url: `/shifaa/patients/${patientId}/`,
+                type: 'GET',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        const patient = response.patient;
+                        const resultHtml = `<p>${patient.first_name} ${patient.last_name} - ${patient.dob} - ${patient.gender} - ${patient.contact_info}</p>`;
+                        $('#search-patient-result').html(resultHtml);
+                    } else {
+                        $('#search-patient-result').html(`<p>${response.message}</p>`);
+                    }
+                },
+                error: function(error) {
+                    $('#search-patient-result').html('<p>Error fetching patient. Please try again.</p>');
+                }
+            });
+        }
+
+
+        // Load all equipment
+        function loadEquipment() {
+            $.ajax({
+                url: '/shifaa/equipment/',
+                type: 'GET',
+                success: function(response) {
+                    let equipmentHtml = '';
+                    response.equipment.forEach(function(equipment) {
+                        equipmentHtml += `
+                            <p>
+                                ${equipment.equipment_name} - ${equipment.description} - Available: ${equipment.available}
+                                <button onclick="editEquipment(${equipment.id}, '${equipment.equipment_name}', '${equipment.description}', ${equipment.available})">Update</button>
+                                <button onclick="deleteEquipment(${equipment.id})">Delete</button>
+                            </p>`;
+                    });
+                    $('#equipment-list').html(equipmentHtml);
+                },
+                error: function(error) {
+                    alert('Error loading equipment');
+                }
+            });
+        }
+
+        // Add new equipment
+        $('#add-equipment-form').submit(function(event) {
+            event.preventDefault();
+            const equipmentData = {
+                equipment_name: $('#equipment_name').val(),
+                description: $('#description').val(),
+                available: $('#available').val(),
+            };
+
+            $.ajax({
+                url: '/shifaa/equipment/add/',
+                type: 'POST',
+                data: equipmentData,
+                success: function(response) {
+                    alert('Equipment added successfully');
+                    loadEquipment();
+                },
+                error: function(error) {
+                    alert('Error adding equipment');
+                }
+            });
+        });
+
+        // Edit equipment
+        function editEquipment(id, name, description, available) {
+            $('#update_equipment_id').val(id);
+            $('#update_equipment_name').val(name);
+            $('#update_description').val(description);
+            $('#update_available').val(available ? 'true' : 'false');
+            $('#update-equipment-section').show();
+        }
+
+        // Update equipment
+        $('#update-equipment-form').submit(function(event) {
+            event.preventDefault();
+            const equipmentId = $('#update_equipment_id').val();
+            const equipmentData = {
+                equipment_name: $('#update_equipment_name').val(),
+                description: $('#update_description').val(),
+                available: $('#update_available').val(),
+            };
+
+            $.ajax({
+                url: `/shifaa/equipment/update/${equipmentId}/`,
+                type: 'POST',
+                data: equipmentData,
+                success: function(response) {
+                    alert('Equipment updated successfully');
+                    loadEquipment();
+                    $('#update-equipment-section').hide();
+                },
+                error: function(error) {
+                    alert('Error updating equipment');
+                }
+            });
+        });
+
+        // Delete equipment
+        function deleteEquipment(id) {
+            if (confirm('Are you sure you want to delete this equipment?')) {
+                $.ajax({
+                    url: `/shifaa/equipment/delete/${id}/`,
+                    type: 'POST',
+                    success: function(response) {
+                        alert('Equipment deleted successfully');
+                        loadEquipment();
+                    },
+                    error: function(error) {
+                        alert('Error deleting equipment');
+                    }
+                });
+            }
+        }
+
+
+        // Open Diagnose Form
+        function openDiagnoseForm(patientId) {
+            $('#diagnose_patient_id').val(patientId);
+            $('#diagnose-form-section').show();  // Show the diagnose form
+        }
+
+        // Handle Diagnose Form Submission
+        $('#diagnose-form').submit(function(event) {
+            event.preventDefault();
+            const patientID = $('#diagnose_patient_id').val();
+            const diagnosticData = {
+                diagnostic_type: $('#diagnostic_type').val(),
+                result: $('#diagnostic_result').val(),
+                date_taken: $('#diagnostic_date_taken').val(),
+                notes: $('#diagnostic_notes').val(),
+            };
+
+            $.ajax({
+                url: `/shifaa/patients/${patientID}/diagnostic/add/`,
+                type: 'POST',
+                data: diagnosticData,
+                success: function(response) {
+                    alert('Diagnostic added successfully');
+                    $('#diagnose-form-section').hide();  // Hide the form after success
+                },
+                error: function(error) {
+                    alert('Error adding diagnostic');
+                }
+            });
+        });
+
+        // Open Referral Form
+        function openReferralForm(patientId) {
+            $('#referral_patient_id').val(patientId);
+            $('#referral-form-section').show();  // Show the referral form
+        }
+
+        // Handle Referral Form Submission
+        $('#referral-form').submit(function(event) {
+            event.preventDefault();
+            const patientID = $('#referral_patient_id').val();
+            const referralData = {
+                referred_from: 2,
+                referred_to: $('#referred_to').val(),
+                referral_reason: $('#referral_reason').val(),
+                referral_date: $('#referral_date').val(),
+                status: 'Pending', 
+            };
+
+            $.ajax({
+                url: `/shifaa/patients/${patientID}/referral/add/`,
+                type: 'POST',
+                data: referralData,
+                success: function(response) {
+                    alert('Referral added successfully');
+                    $('#referral-form-section').hide();  // Hide the form after success
+                },
+                error: function(error) {
+                    alert('Error adding referral');
+                }
+            });
+        });
+
+        // Open Medical History Form
+        function openMedicalHistoryForm(patientId) {
+            $('#medical_history_patient_id').val(patientId);
+            $('#medical-history-form-section').show();  // Show the medical history form
+        }
+
+        // Handle Medical History Form Submission
+        $('#medical-history-form').submit(function(event) {
+            event.preventDefault();
+            const patientID = $('#medical_history_patient_id').val();
+            const medicalHistoryData = {
+                condition: $('#condition').val(),
+                treatment: $('#treatment').val(),
+                start_date: $('#start_date').val(),
+                end_date: $('#end_date').val(),
+                notes: $('#medical_history_notes').val(),
+            };
+
+            $.ajax({
+                url: `/shifaa/patients/${patientID}/history/add/`,
+                type: 'POST',
+                data: medicalHistoryData,
+                success: function(response) {
+                    alert('Medical history added successfully');
+                    $('#medical-history-form-section').hide();  // Hide the form after success
+                },
+                error: function(error) {
+                    alert('Error adding medical history');
+                }
+            });
+        });
+
+
+    </script>
+</body>
+</html>
